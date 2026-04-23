@@ -1,0 +1,28 @@
+.env
+.env.*
+!.env.example
+
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+build/
+target/
+bin/
+tmp/
+scripts/
+
+# Logs
+*.log
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Local generated data
+*.sqlite
+*.db
+*.tsbuildinfo
