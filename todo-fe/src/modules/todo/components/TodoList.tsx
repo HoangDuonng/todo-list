@@ -20,11 +20,32 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import {
+  DndContext,
+  closestCenter,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  SortableContext,
+  verticalListSortingStrategy,
+  arrayMove,
+} from "@dnd-kit/sortable";
 
 const TodoList = () => {
   const [todos, setTodos] = useState<ITodoItem[]>([]);
   const [newTodo, setNewTodo] = useState("");
   const { profile } = useAuth();
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    })
+  );
 
   const handleGetTasks = async () => {
     try {
@@ -134,6 +155,17 @@ const TodoList = () => {
     }
   }, [newTodo, profile]);
 
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (over && active.id !== over.id) {
+      setTodos((items) => {
+        const oldIndex = items.findIndex((item) => item.id === active.id);
+        const newIndex = items.findIndex((item) => item.id === over.id);
+        return arrayMove(items, oldIndex, newIndex);
+      });
+    }
+  };
+
   return (
     <div className="w-full max-w-2xl mx-auto flex flex-col gap-6 py-4">
       <div className="flex justify-center w-full py-4">
@@ -183,16 +215,27 @@ const TodoList = () => {
                 No tasks available. Add some tasks to get started!
               </div>
             ) : (
-              todos.map((todo, index) => (
-                <TodoItem
-                  item={todo}
-                  key={todo.id || index}
-                  onUpdate={handleUpdateTask}
-                  onDelete={handleDeleteTask}
-                  onDone={handleDoneTask}
-                  onDoing={handleDoingTask}
-                />
-              ))
+              <DndContext
+                sensors={sensors}
+                collisionDetection={closestCenter}
+                onDragEnd={handleDragEnd}
+              >
+                <SortableContext
+                  items={todos.map((todo) => todo.id)}
+                  strategy={verticalListSortingStrategy}
+                >
+                  {todos.map((todo, index) => (
+                    <TodoItem
+                      item={todo}
+                      key={todo.id || index}
+                      onUpdate={handleUpdateTask}
+                      onDelete={handleDeleteTask}
+                      onDone={handleDoneTask}
+                      onDoing={handleDoingTask}
+                    />
+                  ))}
+                </SortableContext>
+              </DndContext>
             )}
           </div>
         </CardContent>

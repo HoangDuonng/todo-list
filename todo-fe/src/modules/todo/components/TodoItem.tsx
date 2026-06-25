@@ -1,9 +1,11 @@
 import React, { memo, useMemo, useState } from "react";
 import { ITodoItem } from "../models/todo";
-import { Check, Edit2, Trash2 } from "lucide-react";
+import { Check, Edit2, Trash2, GripVertical } from "lucide-react";
 import DeleteWarningDialog from "./DeleteWarningDialog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { useSortable } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 
 interface TodoItemProps {
   item: ITodoItem;
@@ -25,13 +27,34 @@ const TodoItem: React.FC<TodoItemProps> = ({
   const [editMode, setEditMode] = useState(false);
   const [value, setValue] = useState(item.title);
 
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: item.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+
   const handleUpdate = async () => {
     await onUpdate(item.id, value);
     setEditMode(false);
   };
 
   return (
-    <div className="group flex items-center justify-between bg-card hover:bg-accent/35 border border-border rounded-lg p-4 transition-all duration-200 shadow-sm">
+    <div
+      ref={setNodeRef}
+      style={style}
+      className={`group flex items-center justify-between bg-card hover:bg-accent/35 border border-border rounded-lg p-4 transition-all duration-200 shadow-sm ${
+        isDragging ? "z-50 relative border-primary" : ""
+      }`}
+    >
       {editMode ? (
         <div className="flex w-full justify-center items-center gap-2">
           <Input
@@ -54,7 +77,17 @@ const TodoItem: React.FC<TodoItemProps> = ({
         </div>
       ) : (
         <>
-          <div className="flex items-center gap-3 flex-1 min-w-0">
+          <div className="flex items-center gap-2 flex-1 min-w-0">
+            <Button
+              size="icon"
+              variant="ghost"
+              className="h-8 w-8 text-muted-foreground/40 hover:text-muted-foreground hover:bg-accent shrink-0 cursor-grab active:cursor-grabbing focus-visible:ring-0"
+              {...attributes}
+              {...listeners}
+            >
+              <GripVertical className="h-4 w-4" />
+            </Button>
+
             <button
               className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 transition-all duration-200 focus:outline-none ${
                 isDone 
@@ -76,7 +109,7 @@ const TodoItem: React.FC<TodoItemProps> = ({
               )}
             </button>
 
-            <div className="flex flex-col min-w-0 flex-1">
+            <div className="flex flex-col min-w-0 flex-1 ml-1">
               <p
                 className={`text-sm font-medium break-words cursor-pointer select-none leading-relaxed transition-all duration-200 ${
                   isDone 
