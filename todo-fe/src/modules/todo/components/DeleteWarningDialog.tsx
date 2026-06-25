@@ -45,10 +45,10 @@ const DeleteWarningDialog: React.FC<IDeleteWarningDialogProps> = ({
               leaveFrom="opacity-100 scale-100"
               leaveTo="opacity-0 scale-95"
             >
-              <DialogPanel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-gray-800 p-6 text-left align-middle shadow-xl transition-all">
+              <DialogPanel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-transparent p-6 text-left align-middle shadow-xl transition-all">
                 <DialogTitle
                   as="h3"
-                  className="text-lg font-medium leading-6 text-white flex items-center"
+                  className="text-lg font-medium leading-6 text-gray-900 dark:text-white flex items-center"
                 >
                   <ExclamationTriangleIcon
                     className="h-6 w-6 text-red-500 mr-2"
@@ -57,7 +57,7 @@ const DeleteWarningDialog: React.FC<IDeleteWarningDialogProps> = ({
                   Delete task
                 </DialogTitle>
                 <div className="mt-2">
-                  <p className="text-sm text-gray-300">
+                  <p className="text-sm text-gray-550 dark:text-gray-300">
                     Are you sure you want to delete this task? This action
                     cannot be undone.
                   </p>
@@ -66,7 +66,7 @@ const DeleteWarningDialog: React.FC<IDeleteWarningDialogProps> = ({
                 <div className="mt-4 flex justify-end space-x-3">
                   <button
                     type="button"
-                    className="inline-flex justify-center rounded-md border border-transparent bg-gray-600 px-4 py-2 text-sm font-medium text-white hover:bg-gray-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-500 focus-visible:ring-offset-2"
+                    className="inline-flex justify-center rounded-md border border-transparent bg-gray-100 hover:bg-gray-200 text-gray-700 dark:bg-gray-600 dark:hover:bg-gray-700 dark:text-white px-4 py-2 text-sm font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-500 focus-visible:ring-offset-2 transition-colors duration-200"
                     onClick={onClose}
                   >
                     Cancel

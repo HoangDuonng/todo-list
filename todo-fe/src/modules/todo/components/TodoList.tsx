@@ -160,10 +160,10 @@ const TodoList = () => {
   console.log("render");
 
   return (
-    <div className="min-h-screen bg-gray-900 text-gray-300 py-8">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-300 py-8 transition-colors duration-200">
       <div className="max-w-2xl mx-auto px-4">
         <div className="flex justify-center mb-8 w-full">
-          <img src={Logo} alt="logo" />
+          <img src={Logo} alt="logo" className="dark:invert" />
         </div>
 
         <div className="flex mb-6">
@@ -173,7 +173,7 @@ const TodoList = () => {
             value={newTodo}
             onChange={(e) => setNewTodo(e.target.value)}
             placeholder="Enter a new task..."
-            className="flex-grow bg-gray-800 text-white rounded-l px-4 py-2 focus:outline-none"
+            className="flex-grow bg-white dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-300 dark:border-none rounded-l px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-200"
           />
           <button
             onClick={handleAddTask}
@@ -186,13 +186,13 @@ const TodoList = () => {
         <div className="flex justify-between text-sm mb-4">
           <span>
             Total task{" "}
-            <span className="bg-gray-800 px-2 py-1 rounded-full ml-1">
+            <span className="bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-gray-300 px-2 py-1 rounded-full ml-1 transition-colors duration-200">
               {todos.length}
             </span>
           </span>
-          <span className="text-purple-400">
+          <span className="text-purple-650 dark:text-purple-400">
             Completed{" "}
-            <span className="bg-gray-800 px-2 py-1 rounded-full ml-1">
+            <span className="bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-gray-300 px-2 py-1 rounded-full ml-1 transition-colors duration-200">
               {completedCount} of {todos.length}
             </span>
           </span>

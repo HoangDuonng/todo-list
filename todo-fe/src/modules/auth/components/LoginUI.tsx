@@ -24,9 +24,9 @@ const LoginForm = () => {
 
   return (
     <div className="w-full max-w-md">
-      <div className="bg-gray-800 shadow-md rounded px-8 pt-6 pb-8 mb-4">
+      <div className="bg-white dark:bg-gray-800 border border-gray-150 dark:border-transparent shadow-md rounded px-8 pt-6 pb-8 mb-4 transition-colors duration-200">
         <FormProvider methods={methods} onSubmit={handleSubmit(handleLogin)}>
-          <h2 className="text-2xl font-bold mb-6 text-white text-center">
+          <h2 className="text-2xl font-bold mb-6 text-gray-900 dark:text-white text-center">
             Login
           </h2>
           <div className="mb-4">
@@ -52,7 +52,7 @@ const LoginForm = () => {
             Sign In
           </button>
           <div className="text-center mt-4">
-            <p className="text-gray-300 text-sm">
+            <p className="text-gray-600 dark:text-gray-300 text-sm">
               Don't have an account?{" "}
               <a
                 href="#"

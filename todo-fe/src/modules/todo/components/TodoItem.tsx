@@ -30,7 +30,7 @@ const TodoItem: React.FC<TodoItemProps> = ({
   };
 
   return (
-    <div className="flex items-start justify-center bg-gray-800 rounded p-4">
+    <div className="flex items-start justify-center bg-white dark:bg-gray-800 border border-gray-150 dark:border-none shadow-sm rounded p-4 text-gray-800 dark:text-gray-200 transition-colors duration-200">
       {editMode ? (
         <div className="flex w-full justify-center items-center">
           <input
@@ -40,11 +40,11 @@ const TodoItem: React.FC<TodoItemProps> = ({
             value={value}
             onChange={(e) => setValue(e.target.value)}
             placeholder="Enter a new task..."
-            className="flex-grow  bg-gray-600 text-white rounded px-4 py-1 focus:outline-none"
+            className="flex-grow bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white rounded px-4 py-1 border border-gray-200 dark:border-none focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
           <button
             onClick={handleUpdate}
-            className="ml-2 text-gray-400 hover:text-red-500 flex-shrink-0"
+            className="ml-2 text-gray-500 dark:text-gray-400 hover:text-green-500 flex-shrink-0"
           >
             <Check size={18} />
           </button>
@@ -53,7 +53,7 @@ const TodoItem: React.FC<TodoItemProps> = ({
         <>
           <button
             // onClick={() => toggleTodo(index)}
-            className={`w-5 h-5 rounded-full border-2 mr-3 flex-shrink-0 ${
+            className={`w-5 h-5 rounded-full border-2 mr-3 flex-shrink-0 transition-colors duration-200 ${
               isDone ? "bg-purple-500 border-purple-500" : "border-blue-500"
             }`}
             onClick={() => (isDone ? onDoing(item.id) : onDone(item.id))}
@@ -75,29 +75,29 @@ const TodoItem: React.FC<TodoItemProps> = ({
 
           <div className="flex flex-col flex-1">
             <p
-              className={`flex-grow break-words ${
-                isDone ? "line-through text-gray-500 text-base" : ""
+              className={`flex-grow break-words cursor-pointer ${
+                isDone ? "line-through text-gray-400 dark:text-gray-500 text-base" : "text-gray-800 dark:text-gray-200"
               }`}
               onClick={() => (isDone ? onDoing(item.id) : onDone(item.id))}
             >
               {item.title}
             </p>
-            <div className="text-gray-400 text-xs">
+            <div className="text-gray-500 dark:text-gray-400 text-xs mt-1">
               Author:{" "}
-              <span>
+              <span className="font-medium text-gray-650 dark:text-gray-300">
                 {item.user.first_name} {item.user.last_name}
               </span>
             </div>
           </div>
           <button
             onClick={() => setEditMode(true)}
-            className="ml-2 text-gray-400 hover:text-red-500 flex-shrink-0"
+            className="ml-2 text-gray-450 hover:text-blue-500 dark:hover:text-blue-400 flex-shrink-0 transition-colors duration-150"
           >
             <Edit2 size={18} />
           </button>
           <button
             onClick={() => setOpen(true)}
-            className="ml-2 text-gray-400 hover:text-red-500 flex-shrink-0"
+            className="ml-2 text-gray-450 hover:text-red-500 flex-shrink-0 transition-colors duration-150"
           >
             <Trash2 size={18} />
           </button>

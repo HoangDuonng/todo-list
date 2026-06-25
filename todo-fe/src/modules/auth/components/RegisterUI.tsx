@@ -24,10 +24,10 @@ export const RegisterUI = () => {
 
   return (
     <div className="w-full max-w-md">
-      <div className="bg-gray-800 shadow-md rounded px-8 pt-6 pb-8 mb-4">
+      <div className="bg-white dark:bg-gray-800 border border-gray-150 dark:border-transparent shadow-md rounded px-8 pt-6 pb-8 mb-4 transition-colors duration-200">
         <FormProvider methods={methods} onSubmit={handleSubmit(handleRegister)}>
-          <h2 className="text-2xl font-bold mb-6 text-white text-center">
-            Login
+          <h2 className="text-2xl font-bold mb-6 text-gray-900 dark:text-white text-center">
+            Register
           </h2>
           <div className="mb-4">
             <RHFInput
@@ -69,7 +69,7 @@ export const RegisterUI = () => {
               Register
             </button>
             <a
-              className="inline-block align-baseline font-bold text-sm text-blue-500 hover:text-blue-800"
+              className="inline-block align-baseline font-bold text-sm text-blue-500 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
               href="/login"
             >
               Already have an account?
