@@ -62,6 +62,7 @@ services:
       - DB_DSN=root:root_password_secret_tcp@tcp(mysql:3306)/todo-task?charset=utf8mb4&parseTime=True&loc=Local
       - GIN_PORT=3300
       - GRPC_AUTH_ADDRESS=auth-service:3101
+      - GRPC_USER_ADDRESS=user-service:3201
     networks:
       - todo
     depends_on:
