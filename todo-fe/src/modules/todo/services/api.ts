@@ -33,11 +33,13 @@ export const DeleteTodoAPI = async <T>(id: string): Promise<T> => {
 export const UpdateTodoAPI = async <T>(
   id: string,
   title: string,
+  description?: string,
 ): Promise<T> => {
   return new Promise((resolve, reject) => {
     interceptor
       .patch<T>(`/tasks/v1/tasks/${id}`, {
         title,
+        description,
       })
       .then((res) => {
         resolve(res.data);
@@ -48,11 +50,15 @@ export const UpdateTodoAPI = async <T>(
   });
 };
 
-export const CreateTodoAPI = async <T>(title: string): Promise<T> => {
+export const CreateTodoAPI = async <T>(
+  title: string,
+  description?: string,
+): Promise<T> => {
   return new Promise((resolve, reject) => {
     interceptor
       .post<T>(`/tasks/v1/tasks`, {
         title,
+        description,
       })
       .then((res) => {
         resolve(res.data);
