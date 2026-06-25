@@ -5,9 +5,13 @@ import { registerSchema } from "../models/schema";
 import FormProvider from "../../core/components/FormProvider";
 import { RHFInput } from "../../core/components/RHFInput";
 import { useAuth } from "../hooks/useAuth";
+import { useNavigate } from "react-router-dom";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 
 export const RegisterUI = () => {
   const { handleRegister } = useAuth();
+  const navigate = useNavigate();
   const defaultValues: IRegisterForm = {
     password: "",
     email: "",
@@ -23,60 +27,61 @@ export const RegisterUI = () => {
   const { handleSubmit } = methods;
 
   return (
-    <div className="w-full max-w-md">
-      <div className="bg-white dark:bg-gray-800 border border-gray-150 dark:border-transparent shadow-md rounded px-8 pt-6 pb-8 mb-4 transition-colors duration-200">
+    <Card className="w-full shadow-md border-border">
+      <CardHeader className="space-y-1">
+        <CardTitle className="text-2xl font-bold tracking-tight text-center">Register</CardTitle>
+        <CardDescription className="text-center">
+          Create a new account to start managing your tasks.
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
         <FormProvider methods={methods} onSubmit={handleSubmit(handleRegister)}>
-          <h2 className="text-2xl font-bold mb-6 text-gray-900 dark:text-white text-center">
-            Register
-          </h2>
-          <div className="mb-4">
-            <RHFInput
-              name="first_name"
-              type="text"
-              placeholder="Enter your first name"
-              label="First Name"
-            />
-          </div>
-          <div className="mb-4">
-            <RHFInput
-              name="last_name"
-              type="text"
-              placeholder="Enter your last name"
-              label="Last Name"
-            />
-          </div>
-          <div className="mb-4">
+          <div className="flex flex-col gap-4">
+            <div className="grid grid-cols-2 gap-4">
+              <RHFInput
+                name="first_name"
+                type="text"
+                placeholder="John"
+                label="First Name"
+              />
+              <RHFInput
+                name="last_name"
+                type="text"
+                placeholder="Doe"
+                label="Last Name"
+              />
+            </div>
             <RHFInput
               name="email"
               type="text"
-              placeholder="Enter your email"
+              placeholder="name@example.com"
               label="Email"
             />
-          </div>
-          <div className="mb-6 relative">
             <RHFInput
               name="password"
               type="password"
-              placeholder="Enter your password"
+              placeholder="••••••••"
               label="Password"
             />
-          </div>
-          <div className="flex items-center justify-between">
-            <button
-              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-              type="submit"
-            >
+            <Button className="w-full mt-2" type="submit">
               Register
-            </button>
-            <a
-              className="inline-block align-baseline font-bold text-sm text-blue-500 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
-              href="/login"
-            >
-              Already have an account?
-            </a>
+            </Button>
+            
+            <div className="text-center mt-2">
+              <p className="text-sm text-muted-foreground">
+                Already have an account?{" "}
+                <Button
+                  variant="link"
+                  className="p-0 h-auto font-semibold text-primary"
+                  onClick={() => navigate("/login")}
+                >
+                  Login here
+                </Button>
+              </p>
+            </div>
           </div>
         </FormProvider>
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 };

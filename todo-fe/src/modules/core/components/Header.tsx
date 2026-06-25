@@ -1,10 +1,17 @@
 import { useState } from "react";
-import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
 import { LogOutIcon, Sun, Moon } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import Logo from "../../../assets/logo.svg";
 import Icon from "../../../assets/icon.svg";
 import { useAuth } from "../../auth/hooks/useAuth";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
 
 export const Header: React.FC = () => {
   const { profile, handleLogout } = useAuth();
@@ -26,78 +33,74 @@ export const Header: React.FC = () => {
   };
 
   return (
-    <header className="bg-white dark:bg-gray-800 p-4 flex justify-between items-center border-b border-gray-200 dark:border-none text-gray-800 dark:text-white transition-colors duration-200">
-      <div className="flex items-center">
-        <img
-          onClick={() => {
-            navigate("/");
-          }}
-          src={Logo}
-          alt="Logo"
-          className="h-8 w-auto mr-4 cursor-pointer dark:invert"
-        />
-      </div>
+    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-border transition-colors duration-200">
+      <div className="w-full flex h-16 items-center justify-between px-6">
+        <div className="flex items-center">
+          <img
+            onClick={() => {
+              navigate("/");
+            }}
+            src={Logo}
+            alt="Logo"
+            className="h-8 w-auto mr-4 cursor-pointer dark:invert transition-opacity duration-200 hover:opacity-85"
+          />
+        </div>
 
-      <div className="flex items-center gap-4">
-        <button
-          onClick={toggleTheme}
-          className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300 transition-colors duration-200 focus:outline-none"
-          aria-label="Toggle Theme"
-        >
-          {isDark ? (
-            <Sun className="h-5 w-5 text-yellow-500" />
-          ) : (
-            <Moon className="h-5 w-5" />
-          )}
-        </button>
-
-        <Menu>
-          <MenuButton className="flex items-center focus:outline-none">
-            {/* <UserCircleIcon className="h-8 w-8 text-gray-300 mr-4" /> */}
-            <img
-              src={Icon}
-              alt="Avatar"
-              className="w-8 h-8 rounded-full object-cover dark:invert shrink-0 aspect-square"
-            />
-          </MenuButton>
-
-          <MenuItems
-            transition
-            anchor="bottom end"
-            className="w-52 origin-top-right rounded-xl border border-gray-200 dark:border-white/5 bg-white dark:bg-gray-800 p-1 text-sm text-gray-800 dark:text-white shadow-lg dark:shadow-none transition duration-100 ease-out [--anchor-gap:var(--spacing-1)] focus:outline-none data-[closed]:scale-95 data-[closed]:opacity-0"
+        <div className="flex items-center gap-4">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={toggleTheme}
+            className="h-9 w-9 rounded-full text-muted-foreground hover:text-foreground"
+            aria-label="Toggle Theme"
           >
-            <MenuItem>
-              <button
-                onClick={() => {
-                  navigate("/profile");
-                }}
-                className="group flex w-full items-center gap-2 rounded-lg py-1.5 px-3 data-[focus]:bg-gray-100 dark:data-[focus]:bg-white/10"
-              >
-                {/* <UserCircleIcon className="h-8 w-8 text-gray-300" /> */}
+            {isDark ? (
+              <Sun className="h-5 w-5 text-yellow-500 transition-all duration-200" />
+            ) : (
+              <Moon className="h-5 w-5 transition-all duration-200" />
+            )}
+          </Button>
+
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="relative h-8 w-8 rounded-full focus-visible:ring-0 p-0">
                 <img
                   src={Icon}
                   alt="Avatar"
                   className="w-8 h-8 rounded-full object-cover dark:invert shrink-0 aspect-square"
                 />
-                <span>
-                  {profile?.first_name} {profile?.last_name}
-                </span>
-              </button>
-            </MenuItem>
-
-            <div className="my-1 h-px bg-gray-200 dark:bg-white/5" />
-
-            <MenuItem>
-              <button
-                onClick={handleLogout}
-                className="group flex w-full items-center gap-2 rounded-lg py-1.5 px-3 data-[focus]:bg-gray-100 dark:data-[focus]:bg-white/10"
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-56" align="end" forceMount>
+              <DropdownMenuItem
+                onClick={() => navigate("/profile")}
+                className="flex items-center gap-3 cursor-pointer py-2.5"
               >
-                <LogOutIcon className="size-4 text-gray-500 dark:text-gray-400" />
-                Logout
-              </button>
-            </MenuItem>
-          </MenuItems>
-        </Menu>
+                <img
+                  src={Icon}
+                  alt="Avatar"
+                  className="w-7 h-7 rounded-full object-cover dark:invert shrink-0 aspect-square"
+                />
+                <div className="flex flex-col space-y-0.5">
+                  <p className="text-sm font-medium leading-none">
+                    {profile?.first_name} {profile?.last_name}
+                  </p>
+                  <p className="text-xs leading-none text-muted-foreground">
+                    {profile?.email}
+                  </p>
+                </div>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                onClick={handleLogout}
+                className="flex items-center gap-2 cursor-pointer text-destructive focus:text-destructive focus:bg-destructive/10 py-2.5"
+              >
+                <LogOutIcon className="h-4 w-4" />
+                <span>Logout</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
       </div>
     </header>
   );

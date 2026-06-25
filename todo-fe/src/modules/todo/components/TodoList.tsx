@@ -11,11 +11,15 @@ import {
   UpdateTodoAPI,
 } from "../services/api";
 import { IPagination, IResponse } from "../../core/models/core";
-import { enqueueSnackbar } from "notistack";
+import { toast } from "sonner";
 import { AxiosError } from "axios";
 import { ErrorResponse } from "react-router-dom";
 import { HandleError } from "../../core/services/axios";
 import { useAuth } from "../../auth/hooks/useAuth";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 
 const TodoList = () => {
   const [todos, setTodos] = useState<ITodoItem[]>([]);
@@ -27,19 +31,12 @@ const TodoList = () => {
       const result = await ListTodoAPI<IPagination<ITodoItem>>();
       setTodos(result.data);
     } catch (error) {
-      enqueueSnackbar(
-        HandleError(error as Error | AxiosError<ErrorResponse>).message,
-        {
-          variant: "error",
-        }
-      );
+      toast.error(HandleError(error as Error | AxiosError<ErrorResponse>).message);
     }
   };
 
   useEffect(() => {
-    (async () => {
-      await handleGetTasks();
-    })();
+    handleGetTasks();
   }, []);
 
   const completedCount = useMemo(
@@ -52,14 +49,10 @@ const TodoList = () => {
       if (id) {
         await DeleteTodoAPI(id);
         setTodos((prev) => prev.filter((todo) => todo.id !== id));
+        toast.success("Task deleted successfully");
       }
     } catch (error) {
-      enqueueSnackbar(
-        HandleError(error as Error | AxiosError<ErrorResponse>).message,
-        {
-          variant: "error",
-        }
-      );
+      toast.error(HandleError(error as Error | AxiosError<ErrorResponse>).message);
     }
   }, []);
 
@@ -71,13 +64,9 @@ const TodoList = () => {
           todo.id === id ? { ...todo, status: "done" } : todo
         )
       );
+      toast.success("Task marked as completed");
     } catch (error) {
-      enqueueSnackbar(
-        HandleError(error as Error | AxiosError<ErrorResponse>).message,
-        {
-          variant: "error",
-        }
-      );
+      toast.error(HandleError(error as Error | AxiosError<ErrorResponse>).message);
     }
   }, []);
 
@@ -89,20 +78,16 @@ const TodoList = () => {
           todo.id === id ? { ...todo, status: "doing" } : todo
         )
       );
+      toast.success("Task marked as in progress");
     } catch (error) {
-      enqueueSnackbar(
-        HandleError(error as Error | AxiosError<ErrorResponse>).message,
-        {
-          variant: "error",
-        }
-      );
+      toast.error(HandleError(error as Error | AxiosError<ErrorResponse>).message);
     }
   }, []);
 
   const handleUpdateTask = useCallback(async (id: string, title: string) => {
     try {
-      if (!title || title.length <= 0) {
-        enqueueSnackbar("Title cannot be blank", { variant: "error" });
+      if (!title || title.trim().length === 0) {
+        toast.error("Title cannot be blank");
         return;
       }
 
@@ -110,20 +95,16 @@ const TodoList = () => {
       setTodos((prev) =>
         prev.map((todo) => (todo.id === id ? { ...todo, title } : todo))
       );
+      toast.success("Task updated successfully");
     } catch (error) {
-      enqueueSnackbar(
-        HandleError(error as Error | AxiosError<ErrorResponse>).message,
-        {
-          variant: "error",
-        }
-      );
+      toast.error(HandleError(error as Error | AxiosError<ErrorResponse>).message);
     }
   }, []);
 
   const handleAddTask = useCallback(async () => {
     try {
-      if (!newTodo || newTodo.length <= 0) {
-        enqueueSnackbar("Title cannot be blank", { variant: "error" });
+      if (!newTodo || newTodo.trim().length === 0) {
+        toast.error("Title cannot be blank");
         return;
       }
 
@@ -147,70 +128,75 @@ const TodoList = () => {
       };
       setTodos((prev) => [t, ...prev]);
       setNewTodo("");
+      toast.success("Task added successfully");
     } catch (error) {
-      enqueueSnackbar(
-        HandleError(error as Error | AxiosError<ErrorResponse>).message,
-        {
-          variant: "error",
-        }
-      );
+      toast.error(HandleError(error as Error | AxiosError<ErrorResponse>).message);
     }
   }, [newTodo, profile]);
 
-  console.log("render");
-
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-300 py-8 transition-colors duration-200">
-      <div className="max-w-2xl mx-auto px-4">
-        <div className="flex justify-center mb-8 w-full">
-          <img src={Logo} alt="logo" className="dark:invert" />
-        </div>
-
-        <div className="flex mb-6">
-          <input
-            onKeyDown={(e) => e.key === "Enter" && handleAddTask()}
-            type="text"
-            value={newTodo}
-            onChange={(e) => setNewTodo(e.target.value)}
-            placeholder="Enter a new task..."
-            className="flex-grow bg-white dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-300 dark:border-none rounded-l px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-200"
-          />
-          <button
-            onClick={handleAddTask}
-            className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-r transition duration-200"
-          >
-            Add
-          </button>
-        </div>
-
-        <div className="flex justify-between text-sm mb-4">
-          <span>
-            Total task{" "}
-            <span className="bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-gray-300 px-2 py-1 rounded-full ml-1 transition-colors duration-200">
-              {todos.length}
-            </span>
-          </span>
-          <span className="text-purple-650 dark:text-purple-400">
-            Completed{" "}
-            <span className="bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-gray-300 px-2 py-1 rounded-full ml-1 transition-colors duration-200">
-              {completedCount} of {todos.length}
-            </span>
-          </span>
-        </div>
-
-        <div className="space-y-2">
-          {todos.map((todo, index) => (
-            <TodoItem
-              item={todo}
-              key={index}
-              onUpdate={handleUpdateTask}
-              onDelete={handleDeleteTask}
-              onDone={handleDoneTask}
-              onDoing={handleDoingTask}
-            />
-          ))}
-        </div>
+    <div className="w-full max-w-2xl mx-auto flex flex-col gap-6 py-4">
+      <div className="flex justify-center w-full py-4">
+        <img src={Logo} alt="logo" className="h-10 dark:invert transition-all hover:opacity-85" />
       </div>
+
+      <Card className="w-full shadow-md border-border">
+        <CardHeader className="pb-4">
+          <CardTitle className="text-xl md:text-2xl font-bold tracking-tight">Todo Dashboard</CardTitle>
+          <CardDescription>
+            Manage and monitor your daily tasks in real-time.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="flex flex-col gap-6">
+          <div className="flex gap-2 w-full">
+            <Input
+              onKeyDown={(e) => e.key === "Enter" && handleAddTask()}
+              type="text"
+              value={newTodo}
+              onChange={(e) => setNewTodo(e.target.value)}
+              placeholder="What needs to be done?"
+              className="flex-grow focus-visible:ring-1 focus-visible:ring-ring"
+            />
+            <Button onClick={handleAddTask} variant="default" className="px-5">
+              Add Task
+            </Button>
+          </div>
+
+          <div className="flex justify-between items-center text-sm border-b pb-3 border-border">
+            <div className="flex items-center gap-2">
+              <span className="text-muted-foreground font-medium">Total tasks</span>
+              <Badge variant="secondary" className="px-2 py-0.5 font-bold">
+                {todos.length}
+              </Badge>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-muted-foreground font-medium">Completed</span>
+              <Badge variant="outline" className="px-2 py-0.5 border-primary text-primary font-bold">
+                {completedCount} of {todos.length}
+              </Badge>
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-3 min-h-[200px]">
+            {todos.length === 0 ? (
+              <div className="flex flex-col items-center justify-center text-muted-foreground text-sm flex-grow min-h-[200px] border border-dashed rounded-lg border-border p-8">
+                No tasks available. Add some tasks to get started!
+              </div>
+            ) : (
+              todos.map((todo, index) => (
+                <TodoItem
+                  item={todo}
+                  key={todo.id || index}
+                  onUpdate={handleUpdateTask}
+                  onDelete={handleDeleteTask}
+                  onDone={handleDoneTask}
+                  onDoing={handleDoingTask}
+                />
+              ))
+            )}
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };

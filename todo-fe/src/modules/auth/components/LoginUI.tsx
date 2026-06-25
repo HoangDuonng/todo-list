@@ -6,6 +6,8 @@ import { loginSchema } from "../models/schema";
 import FormProvider from "../../core/components/FormProvider";
 import { useAuth } from "../hooks/useAuth";
 import { useNavigate } from "react-router-dom";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 
 const LoginForm = () => {
   const { handleLogin } = useAuth();
@@ -23,49 +25,48 @@ const LoginForm = () => {
   const { handleSubmit } = methods;
 
   return (
-    <div className="w-full max-w-md">
-      <div className="bg-white dark:bg-gray-800 border border-gray-150 dark:border-transparent shadow-md rounded px-8 pt-6 pb-8 mb-4 transition-colors duration-200">
+    <Card className="w-full shadow-md border-border">
+      <CardHeader className="space-y-1">
+        <CardTitle className="text-2xl font-bold tracking-tight text-center">Login</CardTitle>
+        <CardDescription className="text-center">
+          Enter your email and password to access your account.
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
         <FormProvider methods={methods} onSubmit={handleSubmit(handleLogin)}>
-          <h2 className="text-2xl font-bold mb-6 text-gray-900 dark:text-white text-center">
-            Login
-          </h2>
-          <div className="mb-4">
+          <div className="flex flex-col gap-4">
             <RHFInput
               name="email"
               type="email"
-              placeholder="Enter your email"
+              placeholder="name@example.com"
               label="Email"
             />
-          </div>
-          <div className="mb-6 relative">
             <RHFInput
               name="password"
               type="password"
-              placeholder="Enter your password"
+              placeholder="••••••••"
               label="Password"
             />
-          </div>
-          <button
-            className="bg-blue-500 hover:bg-blue-700 w-full text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-            type="submit"
-          >
-            Sign In
-          </button>
-          <div className="text-center mt-4">
-            <p className="text-gray-600 dark:text-gray-300 text-sm">
-              Don't have an account?{" "}
-              <a
-                href="#"
-                className="text-blue-500 hover:text-blue-800 font-bold"
-                onClick={() => navigate("/register")}
-              >
-                Register here
-              </a>
-            </p>
+            <Button className="w-full mt-2" type="submit">
+              Sign In
+            </Button>
+            
+            <div className="text-center mt-2">
+              <p className="text-sm text-muted-foreground">
+                Don't have an account?{" "}
+                <Button
+                  variant="link"
+                  className="p-0 h-auto font-semibold text-primary"
+                  onClick={() => navigate("/register")}
+                >
+                  Register here
+                </Button>
+              </p>
+            </div>
           </div>
         </FormProvider>
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 };
 
