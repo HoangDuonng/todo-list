@@ -6,6 +6,7 @@ import TodoList from "../../todo/components/TodoList";
 import PageNotFound from "./PageNotFound";
 import { PrivateComponent } from "../../auth/components/PrivateComponent";
 import { MainLayout } from "./MainLayout";
+import { Profile } from "../../auth/components/Profile";
 
 export const MainRouter = () => {
   return (
@@ -27,6 +28,7 @@ export const MainRouter = () => {
         }
       >
         <Route path="/" element={<TodoList />} />
+        <Route path="/profile" element={<Profile />} />
       </Route>
       <Route path="*" element={<PageNotFound />} />
     </Routes>
