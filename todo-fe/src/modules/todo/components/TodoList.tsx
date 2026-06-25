@@ -7,8 +7,10 @@ import {
   DeleteTodoAPI,
   DoingTodoAPI,
   DoneTodoAPI,
+  GetNoteAPI,
   ListTodoAPI,
   UpdateTodoAPI,
+  UpsertNoteAPI,
 } from "../services/api";
 import { IPagination, IResponse } from "../../core/models/core";
 import { toast } from "sonner";
@@ -41,7 +43,6 @@ const TodoList = () => {
   const [newTodo, setNewTodo] = useState("");
   const { profile } = useAuth();
   const [note, setNote] = useState("");
-  const [noteTaskId, setNoteTaskId] = useState<string | null>(null);
   const [isSavingNote, setIsSavingNote] = useState(false);
   const lastSavedNote = useRef<string | null>(null);
 
@@ -56,25 +57,27 @@ const TodoList = () => {
   const handleGetTasks = async () => {
     try {
       const result = await ListTodoAPI<IPagination<ITodoItem>>();
-      const noteTask = result.data.find((todo) => todo.title === "__quick_note__");
-      const normalTasks = result.data.filter((todo) => todo.title !== "__quick_note__");
-
-      setTodos(normalTasks);
-      if (noteTask) {
-        const content = noteTask.description || "";
-        setNote(content);
-        lastSavedNote.current = content;
-        setNoteTaskId(noteTask.id);
-      } else {
-        lastSavedNote.current = "";
-      }
+      setTodos(result.data);
     } catch (error) {
       toast.error(HandleError(error as Error | AxiosError<ErrorResponse>).message);
     }
   };
 
+  const handleGetNote = async () => {
+    try {
+      const result = await GetNoteAPI<IResponse<{ content: string }>>();
+      const content = result.data?.content || "";
+      setNote(content);
+      lastSavedNote.current = content;
+    } catch (error) {
+      toast.error("Failed to load note: " + HandleError(error as Error).message);
+      lastSavedNote.current = "";
+    }
+  };
+
   useEffect(() => {
     handleGetTasks();
+    handleGetNote();
   }, []);
 
   // Debounced auto-save for notes
@@ -90,14 +93,8 @@ const TodoList = () => {
     setIsSavingNote(true);
     const delayDebounceFn = setTimeout(async () => {
       try {
-        if (noteTaskId) {
-          await UpdateTodoAPI(noteTaskId, "__quick_note__", note);
-          lastSavedNote.current = note;
-        } else {
-          const result = await CreateTodoAPI<IResponse<string>>("__quick_note__", note);
-          setNoteTaskId(result.data);
-          lastSavedNote.current = note;
-        }
+        await UpsertNoteAPI(note);
+        lastSavedNote.current = note;
       } catch (error) {
         toast.error("Failed to save note: " + HandleError(error as Error).message);
       } finally {
@@ -106,7 +103,7 @@ const TodoList = () => {
     }, 1000);
 
     return () => clearTimeout(delayDebounceFn);
-  }, [note, noteTaskId]);
+  }, [note]);
 
   const completedCount = useMemo(
     () => todos.filter((todo) => todo.status === "done").length,

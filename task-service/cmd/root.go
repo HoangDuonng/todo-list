@@ -79,6 +79,13 @@ func SetupRoutes(router *gin.RouterGroup, serviceCtx sctx.ServiceContext) {
 		tasks.PATCH("/:task-id/doing", taskAPIService.DoingTaskHdl())
 		tasks.DELETE("/:task-id", taskAPIService.DeleteTaskHdl())
 	}
+
+	noteAPIService := composer.ComposeNoteAPIService(serviceCtx)
+	notes := router.Group("/notes", requireAuthMdw)
+	{
+		notes.GET("", noteAPIService.GetNoteHdl())
+		notes.PUT("", noteAPIService.UpsertNoteHdl())
+	}
 }
 
 func Execute() {

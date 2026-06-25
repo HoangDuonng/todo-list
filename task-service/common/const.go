@@ -8,4 +8,5 @@ const (
 
 	MaskTypeUser = 1
 	MaskTypeTask = 2
+	MaskTypeNote = 3
 )

@@ -6,6 +6,11 @@ import (
 	taskSQLRepository "demo-service/services/task/repository/mysql"
 	taskUserRPC "demo-service/services/task/repository/rpc"
 	taskAPI "demo-service/services/task/transport/api"
+
+	noteBusiness "demo-service/services/note/business"
+	noteSQLRepository "demo-service/services/note/repository/mysql"
+	noteAPI "demo-service/services/note/transport/api"
+
 	"github.com/gin-gonic/gin"
 	sctx "github.com/hoangduonng/service-context"
 )
@@ -20,6 +25,11 @@ type TaskService interface {
 	DoingTaskHdl() func(*gin.Context)
 }
 
+type NoteService interface {
+	GetNoteHdl() func(*gin.Context)
+	UpsertNoteHdl() func(*gin.Context)
+}
+
 func ComposeTaskAPIService(serviceCtx sctx.ServiceContext) TaskService {
 	db := serviceCtx.MustGet(common.KeyCompMySQL).(common.GormComponent)
 
@@ -27,6 +37,16 @@ func ComposeTaskAPIService(serviceCtx sctx.ServiceContext) TaskService {
 	taskRepo := taskSQLRepository.NewMySQLRepository(db.GetDB())
 	biz := taskBusiness.NewBusiness(taskRepo, userClient)
 	serviceAPI := taskAPI.NewAPI(serviceCtx, biz)
+
+	return serviceAPI
+}
+
+func ComposeNoteAPIService(serviceCtx sctx.ServiceContext) NoteService {
+	db := serviceCtx.MustGet(common.KeyCompMySQL).(common.GormComponent)
+
+	noteRepo := noteSQLRepository.NewMySQLRepository(db.GetDB())
+	biz := noteBusiness.NewBusiness(noteRepo)
+	serviceAPI := noteAPI.NewAPI(serviceCtx, biz)
 
 	return serviceAPI
 }

@@ -94,3 +94,31 @@ export const DoingTodoAPI = async <T>(id: string): Promise<T> => {
       });
   });
 };
+
+export const GetNoteAPI = async <T>(): Promise<T> => {
+  return new Promise((resolve, reject) => {
+    interceptor
+      .get<T>("/tasks/v1/notes")
+      .then((res) => {
+        resolve(res.data);
+      })
+      .catch((err) => {
+        reject(err);
+      });
+  });
+};
+
+export const UpsertNoteAPI = async <T>(content: string): Promise<T> => {
+  return new Promise((resolve, reject) => {
+    interceptor
+      .put<T>("/tasks/v1/notes", {
+        content,
+      })
+      .then((res) => {
+        resolve(res.data);
+      })
+      .catch((err) => {
+        reject(err);
+      });
+  });
+};
