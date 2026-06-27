@@ -1,0 +1,81 @@
+name: CI - Task Service
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'task-service/**'
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v6
+        with:
+          go-version: '1.19'
+          cache-dependency-path: 'task-service/go.sum'
+
+      - name: Run Tests
+        run: |
+          cd task-service
+          go test -v ./...
+
+      - name: Authenticate to GCP
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Configure Docker
+        run: |
+          gcloud auth configure-docker asia-southeast1-docker.pkg.dev
+
+      - name: Build and Push
+        run: |
+          docker build -t asia-southeast1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/todo-repo/task-service:${{ github.sha }} ./task-service
+          docker push asia-southeast1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/todo-repo/task-service:${{ github.sha }}
+
+      - name: Notify Telegram (success)
+        if: success()
+        uses: appleboy/telegram-action@master
+        with:
+          to: ${{ secrets.TELEGRAM_CHAT_ID }}
+          token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          format: markdown
+          message: |
+            ✓ CI Build & Test successful
+
+            *Project* : todo-list
+            *Service* : task-service
+            *Branch* : ${{ github.head_ref }} -> ${{ github.base_ref }}
+            *By* : ${{ github.actor }}
+            *Commit* : ${{ github.event.pull_request.title || github.event.head_commit.message }}
+
+      - name: Notify Telegram (failure)
+        if: failure()
+        uses: appleboy/telegram-action@master
+        with:
+          to: ${{ secrets.TELEGRAM_CHAT_ID }}
+          token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          format: markdown
+          message: |
+            ✗ CI Build & Test failed
+
+            *Project* : todo-list
+            *Service* : task-service
+            *Branch* : ${{ github.head_ref }} -> ${{ github.base_ref }}
+            *By* : ${{ github.actor }}
+            *Commit* : ${{ github.event.pull_request.title || github.event.head_commit.message }}
+            *Log* : [View Run Log](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
