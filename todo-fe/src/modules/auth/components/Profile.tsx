@@ -30,7 +30,7 @@ export const Profile = () => {
         avatar: profile?.avatar || "",
       });
       toast.success("Profile updated successfully");
-    } catch (error) {
+    } catch {
       // Errors are already handled or we can display a general fallback
     } finally {
       setIsUpdating(false);

@@ -3,6 +3,7 @@ import { FormProvider as Form } from "react-hook-form";
 
 interface FormProviderProps {
   children: React.ReactNode;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   methods: any;
   onSubmit?: React.FormEventHandler<HTMLFormElement>;
 }
