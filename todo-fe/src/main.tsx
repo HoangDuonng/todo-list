@@ -15,5 +15,4 @@ const Root = () => {
   }
 };
 
-// Trigger CI
 createRoot(document.getElementById("root")!).render(<Root />);
