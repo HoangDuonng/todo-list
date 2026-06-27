@@ -1,7 +1,7 @@
 name: CI - Frontend Service
 
 on:
-  pull_request:
+  push:
     branches:
       - main
     paths:
@@ -68,9 +68,9 @@ jobs:
 
             *Project* : todo-list
             *Service* : todo-fe
-            *Branch* : ${{ github.head_ref }} -> ${{ github.base_ref }}
+            *Branch* : ${{ github.ref_name }}
             *By* : ${{ github.actor }}
-            *Commit* : ${{ github.event.pull_request.title || github.event.head_commit.message }}
+            *Commit* : ${{ github.event.head_commit.message }}
 
       - name: Notify Telegram (failure)
         if: failure()
@@ -84,7 +84,7 @@ jobs:
 
             *Project* : todo-list
             *Service* : todo-fe
-            *Branch* : ${{ github.head_ref }} -> ${{ github.base_ref }}
+            *Branch* : ${{ github.ref_name }}
             *By* : ${{ github.actor }}
             *Commit* : ${{ github.event.pull_request.title || github.event.head_commit.message }}
             *Log* : [View Run Log](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
