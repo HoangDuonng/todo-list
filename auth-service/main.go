@@ -3,6 +3,6 @@ package main
 import "demo-service/cmd"
 
 func main() {
-	// Trigger CI/CD
+	// Test gke
 	cmd.Execute()
 }
