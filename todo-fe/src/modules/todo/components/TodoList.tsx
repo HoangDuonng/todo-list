@@ -256,7 +256,7 @@ const TodoList = () => {
                   <div className="flex gap-2">
                     {(["low", "medium", "urgent"] as TodoPriority[]).map((p) => {
                       let activeClass = "";
-                      let inactiveClass = "border-muted-foreground/30 text-muted-foreground hover:bg-accent hover:text-foreground";
+                      const inactiveClass = "border-muted-foreground/30 text-muted-foreground hover:bg-accent hover:text-foreground";
                       if (p === "low") {
                         activeClass = "bg-blue-500/10 text-blue-500 border-blue-500/30 dark:bg-blue-500/20";
                       } else if (p === "medium") {
