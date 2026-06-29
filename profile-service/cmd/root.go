@@ -35,13 +35,15 @@ var rootCmd = &cobra.Command{
 	Use:   "app",
 	Short: "Start service",
 	Run: func(cmd *cobra.Command, args []string) {
-		serviceCtx := newServiceCtx()
-
-		logger := sctx.GlobalLogger().GetLogger("service")
-
 		// Make some delay for DB ready (migration)
 		// remove it if you already had your own DB
 		time.Sleep(time.Second * 5)
+
+		common.RunDBMigration("migrations")
+
+		serviceCtx := newServiceCtx()
+
+		logger := sctx.GlobalLogger().GetLogger("service")
 
 		if err := serviceCtx.Load(); err != nil {
 			logger.Fatal(err)
