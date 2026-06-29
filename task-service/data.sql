@@ -20,6 +20,7 @@ CREATE TABLE `tasks` (
   `title` varchar(150) DEFAULT NULL,
   `description` text,
   `status` enum('doing','done','deleted') DEFAULT 'doing',
+  `priority` enum('low','medium','urgent') DEFAULT 'medium',
   `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
   `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
