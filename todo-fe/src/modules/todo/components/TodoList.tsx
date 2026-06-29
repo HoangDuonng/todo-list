@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { ITodoItem } from "../models/todo";
+import { ITodoItem, TodoPriority, serializeTaskDescription } from "../models/todo";
 import TodoItem from "./TodoItem";
 import Logo from "../../../assets/logo.svg";
 import {
@@ -41,6 +41,7 @@ import {
 const TodoList = () => {
   const [todos, setTodos] = useState<ITodoItem[]>([]);
   const [newTodo, setNewTodo] = useState("");
+  const [priority, setPriority] = useState<TodoPriority>("medium");
   const { profile } = useAuth();
   const [note, setNote] = useState("");
   const [isSavingNote, setIsSavingNote] = useState(false);
@@ -150,16 +151,16 @@ const TodoList = () => {
     }
   }, []);
 
-  const handleUpdateTask = useCallback(async (id: string, title: string) => {
+  const handleUpdateTask = useCallback(async (id: string, title: string, description?: string) => {
     try {
       if (!title || title.trim().length === 0) {
         toast.error("Title cannot be blank");
         return;
       }
 
-      await UpdateTodoAPI(id, title);
+      await UpdateTodoAPI(id, title, description);
       setTodos((prev) =>
-        prev.map((todo) => (todo.id === id ? { ...todo, title } : todo))
+        prev.map((todo) => (todo.id === id ? { ...todo, title, description: description !== undefined ? description : todo.description } : todo))
       );
       toast.success("Task updated successfully");
     } catch (error) {
@@ -174,12 +175,13 @@ const TodoList = () => {
         return;
       }
 
-      const result = await CreateTodoAPI<IResponse<string>>(newTodo);
+      const serializedDescription = serializeTaskDescription(priority, "");
+      const result = await CreateTodoAPI<IResponse<string>>(newTodo, serializedDescription);
       const t: ITodoItem = {
         id: result.data,
         title: newTodo,
         status: "doing",
-        description: "",
+        description: serializedDescription,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
         user: {
@@ -194,11 +196,12 @@ const TodoList = () => {
       };
       setTodos((prev) => [t, ...prev]);
       setNewTodo("");
+      setPriority("medium");
       toast.success("Task added successfully");
     } catch (error) {
       toast.error(HandleError(error as Error | AxiosError<ErrorResponse>).message);
     }
-  }, [newTodo, profile]);
+  }, [newTodo, priority, profile]);
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
@@ -234,18 +237,49 @@ const TodoList = () => {
 
           <TabsContent value="tasks" className="mt-0 focus-visible:ring-0">
             <CardContent className="pt-6 flex flex-col gap-6">
-              <div className="flex gap-2 w-full">
-                <Input
-                  onKeyDown={(e) => e.key === "Enter" && handleAddTask()}
-                  type="text"
-                  value={newTodo}
-                  onChange={(e) => setNewTodo(e.target.value)}
-                  placeholder="What needs to be done?"
-                  className="flex-grow focus-visible:ring-1 focus-visible:ring-ring"
-                />
-                <Button onClick={handleAddTask} variant="default" className="px-5">
-                  Add Task
-                </Button>
+              <div className="flex flex-col gap-3 w-full bg-accent/20 p-3 rounded-lg border border-border">
+                <div className="flex gap-2 w-full">
+                  <Input
+                    onKeyDown={(e) => e.key === "Enter" && handleAddTask()}
+                    type="text"
+                    value={newTodo}
+                    onChange={(e) => setNewTodo(e.target.value)}
+                    placeholder="What needs to be done?"
+                    className="flex-grow focus-visible:ring-1 focus-visible:ring-ring bg-background"
+                  />
+                  <Button onClick={handleAddTask} variant="default" className="px-5 shrink-0 font-semibold">
+                    Add Task
+                  </Button>
+                </div>
+                <div className="flex items-center gap-3 text-xs pl-1">
+                  <span className="text-muted-foreground font-medium">Độ ưu tiên cho tác vụ mới:</span>
+                  <div className="flex gap-2">
+                    {(["low", "medium", "urgent"] as TodoPriority[]).map((p) => {
+                      let activeClass = "";
+                      let inactiveClass = "border-muted-foreground/30 text-muted-foreground hover:bg-accent hover:text-foreground";
+                      if (p === "low") {
+                        activeClass = "bg-blue-500/10 text-blue-500 border-blue-500/30 dark:bg-blue-500/20";
+                      } else if (p === "medium") {
+                        activeClass = "bg-yellow-500/10 text-yellow-600 border-yellow-500/30 dark:bg-yellow-500/20 dark:text-yellow-400";
+                      } else {
+                        activeClass = "bg-red-500/10 text-red-500 border-red-500/30 dark:bg-red-500/20";
+                      }
+                      const label = p === "low" ? "Thấp" : p === "medium" ? "Trung bình" : "Khẩn cấp";
+                      return (
+                        <button
+                          key={p}
+                          type="button"
+                          onClick={() => setPriority(p)}
+                          className={`px-3 py-1 rounded border text-[11px] font-semibold transition-all shadow-sm ${
+                            priority === p ? activeClass : inactiveClass
+                          }`}
+                        >
+                          {label}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
               </div>
 
               <div className="flex justify-between items-center text-sm border-b pb-3 border-border">
