@@ -1,5 +1,5 @@
 import React, { memo, useMemo, useState } from "react";
-import { ITodoItem } from "../models/todo";
+import { ITodoItem, TodoPriority, parseTaskDescription, serializeTaskDescription } from "../models/todo";
 import { Check, Edit2, Trash2, GripVertical } from "lucide-react";
 import DeleteWarningDialog from "./DeleteWarningDialog";
 import { Input } from "@/components/ui/input";
@@ -10,7 +10,7 @@ import { CSS } from "@dnd-kit/utilities";
 interface TodoItemProps {
   item: ITodoItem;
   onDelete: (id: string) => Promise<void>;
-  onUpdate: (id: string, title: string) => Promise<void>;
+  onUpdate: (id: string, title: string, description?: string) => Promise<void>;
   onDone: (id: string) => Promise<void>;
   onDoing: (id: string) => Promise<void>;
 }
@@ -27,6 +27,13 @@ const TodoItem: React.FC<TodoItemProps> = ({
   const [editMode, setEditMode] = useState(false);
   const [value, setValue] = useState(item.title);
 
+  // Parse priority and description
+  const { priority, descriptionText } = useMemo(() => {
+    return parseTaskDescription(item.description);
+  }, [item.description]);
+
+  const [editPriority, setEditPriority] = useState<TodoPriority>(priority);
+
   const {
     attributes,
     listeners,
@@ -42,8 +49,15 @@ const TodoItem: React.FC<TodoItemProps> = ({
     opacity: isDragging ? 0.5 : 1,
   };
 
+  const handleStartEdit = () => {
+    setValue(item.title);
+    setEditPriority(priority);
+    setEditMode(true);
+  };
+
   const handleUpdate = async () => {
-    await onUpdate(item.id, value);
+    const serialized = serializeTaskDescription(editPriority, descriptionText);
+    await onUpdate(item.id, value, serialized);
     setEditMode(false);
   };
 
@@ -56,24 +70,55 @@ const TodoItem: React.FC<TodoItemProps> = ({
       }`}
     >
       {editMode ? (
-        <div className="flex w-full justify-center items-center gap-2">
-          <Input
-            onKeyDown={(e) => e.key === "Enter" && handleUpdate()}
-            type="text"
-            autoFocus
-            value={value}
-            onChange={(e) => setValue(e.target.value)}
-            placeholder="Enter a new task..."
-            className="flex-grow h-9"
-          />
-          <Button
-            size="icon"
-            variant="ghost"
-            onClick={handleUpdate}
-            className="text-green-600 hover:text-green-750 hover:bg-green-100/50 dark:hover:bg-green-900/30 h-9 w-9 shrink-0"
-          >
-            <Check className="h-4 w-4" />
-          </Button>
+        <div className="flex flex-col w-full gap-2">
+          <div className="flex w-full justify-center items-center gap-2">
+            <Input
+              onKeyDown={(e) => e.key === "Enter" && handleUpdate()}
+              type="text"
+              autoFocus
+              value={value}
+              onChange={(e) => setValue(e.target.value)}
+              placeholder="Enter a new task..."
+              className="flex-grow h-9 text-sm"
+            />
+            <Button
+              size="icon"
+              variant="ghost"
+              onClick={handleUpdate}
+              className="text-green-600 hover:text-green-700 hover:bg-green-100/50 dark:hover:bg-green-900/30 h-9 w-9 shrink-0"
+            >
+              <Check className="h-4 w-4" />
+            </Button>
+          </div>
+          <div className="flex items-center gap-2 text-xs">
+            <span className="text-muted-foreground font-medium">Độ ưu tiên:</span>
+            <div className="flex gap-1.5">
+              {(["low", "medium", "urgent"] as TodoPriority[]).map((p) => {
+                let activeClass = "";
+                let inactiveClass = "border-muted-foreground/30 text-muted-foreground hover:bg-accent";
+                if (p === "low") {
+                  activeClass = "bg-blue-500/10 text-blue-500 border-blue-500/30 dark:bg-blue-500/20";
+                } else if (p === "medium") {
+                  activeClass = "bg-yellow-500/10 text-yellow-600 border-yellow-500/30 dark:bg-yellow-500/20 dark:text-yellow-400";
+                } else {
+                  activeClass = "bg-red-500/10 text-red-500 border-red-500/30 dark:bg-red-500/20";
+                }
+                const label = p === "low" ? "Thấp" : p === "medium" ? "Trung bình" : "Khẩn cấp";
+                return (
+                  <button
+                    key={p}
+                    type="button"
+                    onClick={() => setEditPriority(p)}
+                    className={`px-2 py-0.5 rounded border text-[11px] transition-all font-semibold ${
+                      editPriority === p ? activeClass : inactiveClass
+                    }`}
+                  >
+                    {label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
         </div>
       ) : (
         <>
@@ -110,16 +155,33 @@ const TodoItem: React.FC<TodoItemProps> = ({
             </button>
 
             <div className="flex flex-col min-w-0 flex-1 ml-1">
-              <p
-                className={`text-sm font-medium break-words cursor-pointer select-none leading-relaxed transition-all duration-200 ${
-                  isDone 
-                    ? "line-through text-muted-foreground" 
-                    : "text-foreground"
-                }`}
-                onClick={() => (isDone ? onDoing(item.id) : onDone(item.id))}
-              >
-                {item.title}
-              </p>
+              <div className="flex items-center gap-2 flex-wrap">
+                <p
+                  className={`text-sm font-medium break-words cursor-pointer select-none leading-relaxed transition-all duration-200 ${
+                    isDone 
+                      ? "line-through text-muted-foreground" 
+                      : "text-foreground"
+                  }`}
+                  onClick={() => (isDone ? onDoing(item.id) : onDone(item.id))}
+                >
+                  {item.title}
+                </p>
+                {priority === "urgent" && (
+                  <span className="px-1.5 py-0.5 text-[10px] font-bold rounded bg-red-500/10 text-red-500 border border-red-500/20 dark:bg-red-500/20 shadow-sm animate-pulse">
+                    Khẩn cấp
+                  </span>
+                )}
+                {priority === "medium" && (
+                  <span className="px-1.5 py-0.5 text-[10px] font-bold rounded bg-yellow-500/10 text-yellow-600 border border-yellow-500/20 dark:bg-yellow-500/20 dark:text-yellow-400">
+                    Trung bình
+                  </span>
+                )}
+                {priority === "low" && (
+                  <span className="px-1.5 py-0.5 text-[10px] font-bold rounded bg-blue-500/10 text-blue-500 border border-blue-500/20 dark:bg-blue-500/20">
+                    Thấp
+                  </span>
+                )}
+              </div>
               <span className="text-[11px] text-muted-foreground mt-0.5 select-none">
                 Author: {item.user.first_name} {item.user.last_name}
               </span>
@@ -130,7 +192,7 @@ const TodoItem: React.FC<TodoItemProps> = ({
             <Button
               size="icon"
               variant="ghost"
-              onClick={() => setEditMode(true)}
+              onClick={handleStartEdit}
               className="h-8 w-8 text-muted-foreground hover:text-primary hover:bg-accent focus-visible:ring-0"
             >
               <Edit2 className="h-3.5 w-3.5" />
