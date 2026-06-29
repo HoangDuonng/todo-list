@@ -1,5 +1,5 @@
 import React, { memo, useMemo, useState } from "react";
-import { ITodoItem, TodoPriority, parseTaskDescription, serializeTaskDescription } from "../models/todo";
+import { ITodoItem, TodoPriority } from "../models/todo";
 import { Check, Edit2, Trash2, GripVertical } from "lucide-react";
 import DeleteWarningDialog from "./DeleteWarningDialog";
 import { Input } from "@/components/ui/input";
@@ -10,7 +10,7 @@ import { CSS } from "@dnd-kit/utilities";
 interface TodoItemProps {
   item: ITodoItem;
   onDelete: (id: string) => Promise<void>;
-  onUpdate: (id: string, title: string, description?: string) => Promise<void>;
+  onUpdate: (id: string, title: string, description?: string, priority?: string) => Promise<void>;
   onDone: (id: string) => Promise<void>;
   onDoing: (id: string) => Promise<void>;
 }
@@ -27,11 +27,7 @@ const TodoItem: React.FC<TodoItemProps> = ({
   const [editMode, setEditMode] = useState(false);
   const [value, setValue] = useState(item.title);
 
-  // Parse priority and description
-  const { priority, descriptionText } = useMemo(() => {
-    return parseTaskDescription(item.description);
-  }, [item.description]);
-
+  const priority = item.priority || "medium";
   const [editPriority, setEditPriority] = useState<TodoPriority>(priority);
 
   const {
@@ -56,8 +52,7 @@ const TodoItem: React.FC<TodoItemProps> = ({
   };
 
   const handleUpdate = async () => {
-    const serialized = serializeTaskDescription(editPriority, descriptionText);
-    await onUpdate(item.id, value, serialized);
+    await onUpdate(item.id, value, item.description, editPriority);
     setEditMode(false);
   };
 

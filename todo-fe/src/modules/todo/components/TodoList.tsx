@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { ITodoItem, TodoPriority, serializeTaskDescription } from "../models/todo";
+import { ITodoItem, TodoPriority } from "../models/todo";
 import TodoItem from "./TodoItem";
 import Logo from "../../../assets/logo.svg";
 import {
@@ -151,16 +151,21 @@ const TodoList = () => {
     }
   }, []);
 
-  const handleUpdateTask = useCallback(async (id: string, title: string, description?: string) => {
+  const handleUpdateTask = useCallback(async (id: string, title: string, description?: string, priority?: string) => {
     try {
       if (!title || title.trim().length === 0) {
         toast.error("Title cannot be blank");
         return;
       }
 
-      await UpdateTodoAPI(id, title, description);
+      await UpdateTodoAPI(id, title, description, priority);
       setTodos((prev) =>
-        prev.map((todo) => (todo.id === id ? { ...todo, title, description: description !== undefined ? description : todo.description } : todo))
+        prev.map((todo) => (todo.id === id ? {
+          ...todo,
+          title,
+          description: description !== undefined ? description : todo.description,
+          priority: priority !== undefined ? (priority as TodoPriority) : todo.priority
+        } : todo))
       );
       toast.success("Task updated successfully");
     } catch (error) {
@@ -175,13 +180,13 @@ const TodoList = () => {
         return;
       }
 
-      const serializedDescription = serializeTaskDescription(priority, "");
-      const result = await CreateTodoAPI<IResponse<string>>(newTodo, serializedDescription);
+      const result = await CreateTodoAPI<IResponse<string>>(newTodo, "", priority);
       const t: ITodoItem = {
         id: result.data,
         title: newTodo,
         status: "doing",
-        description: serializedDescription,
+        description: "",
+        priority: priority,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
         user: {

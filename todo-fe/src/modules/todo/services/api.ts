@@ -34,12 +34,14 @@ export const UpdateTodoAPI = async <T>(
   id: string,
   title: string,
   description?: string,
+  priority?: string,
 ): Promise<T> => {
   return new Promise((resolve, reject) => {
     interceptor
       .patch<T>(`/tasks/v1/tasks/${id}`, {
         title,
         description,
+        priority,
       })
       .then((res) => {
         resolve(res.data);
@@ -53,12 +55,14 @@ export const UpdateTodoAPI = async <T>(
 export const CreateTodoAPI = async <T>(
   title: string,
   description?: string,
+  priority?: string,
 ): Promise<T> => {
   return new Promise((resolve, reject) => {
     interceptor
       .post<T>(`/tasks/v1/tasks`, {
         title,
         description,
+        priority,
       })
       .then((res) => {
         resolve(res.data);
