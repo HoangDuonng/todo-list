@@ -95,7 +95,7 @@ const TodoItem: React.FC<TodoItemProps> = ({
             <div className="flex gap-1.5">
               {(["low", "medium", "urgent"] as TodoPriority[]).map((p) => {
                 let activeClass = "";
-                let inactiveClass = "border-muted-foreground/30 text-muted-foreground hover:bg-accent";
+                const inactiveClass = "border-muted-foreground/30 text-muted-foreground hover:bg-accent";
                 if (p === "low") {
                   activeClass = "bg-blue-500/10 text-blue-500 border-blue-500/30 dark:bg-blue-500/20";
                 } else if (p === "medium") {
