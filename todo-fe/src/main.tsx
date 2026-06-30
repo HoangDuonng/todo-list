@@ -15,5 +15,5 @@ const Root = () => {
   }
 };
 
-// Test gke
+// Test argo
 createRoot(document.getElementById("root")!).render(<Root />);

@@ -3,6 +3,6 @@ package main
 import "demo-service/cmd"
 
 func main() {
-	// Test gke
+	// Test argo
 	cmd.Execute()
 }
