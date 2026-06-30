@@ -18,6 +18,21 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Notify Telegram (In Progress)
+        uses: appleboy/telegram-action@master
+        with:
+          to: ${{ secrets.TELEGRAM_CHAT_ID }}
+          token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          format: markdown
+          message: |
+            ⏳ CI Build & Test in progress...
+
+            *Project* : todo-list
+            *Service* : auth-service
+            *Branch* : ${{ github.ref_name }}
+            *By* : ${{ github.actor }}
+            *Commit* : ${{ github.event.head_commit.message }}
+
       - name: Set up Go
         uses: actions/setup-go@v6
         with:
@@ -46,6 +61,27 @@ jobs:
         run: |
           docker build -t asia-southeast1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/todo-repo/auth-service:${{ github.sha }} ./auth-service
           docker push asia-southeast1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/todo-repo/auth-service:${{ github.sha }}
+
+      - name: Checkout GitOps repository
+        uses: actions/checkout@v4
+        with:
+          repository: 'HoangDuonng/todo-gitops-config'
+          token: ${{ secrets.GITOPS_PAT }}
+          path: 'gitops'
+
+      - name: Update Image Tag
+        run: |
+          cd gitops
+          yq -i '.authService.image.tag = "${{ github.sha }}"' values-tags.yaml
+
+      - name: Commit and Push
+        run: |
+          cd gitops
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add values-tags.yaml
+          git commit -m "chore(deploy): update auth-service image tag to ${{ github.sha }} [skip ci]" || echo "No changes to commit"
+          git push origin main
 
       - name: Notify Telegram (success)
         if: success()
