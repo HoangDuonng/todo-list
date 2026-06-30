@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ITodoItem, TodoPriority } from "../models/todo";
 import TodoItem from "./TodoItem";
 import Logo from "../../../assets/logo.svg";
+import { Heart } from "lucide-react";
 import {
   CreateTodoAPI,
   DeleteTodoAPI,
@@ -366,6 +367,18 @@ const TodoList = () => {
           </TabsContent>
         </Tabs>
       </Card>
+
+      <div className="flex justify-center items-center w-full mt-2">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => toast.info("Designed with ❤️ for DevOps & GitOps workflows!")}
+          className="text-xs text-muted-foreground hover:text-foreground gap-1.5 transition-all duration-200"
+        >
+          <Heart className="h-3.5 w-3.5 text-red-500 fill-red-500/20" />
+          <span>Made by Hoang Duong</span>
+        </Button>
+      </div>
     </div>
   );
 };

@@ -15,5 +15,5 @@ const Root = () => {
   }
 };
 
-// Test argo
+// Test full flow
 createRoot(document.getElementById("root")!).render(<Root />);
