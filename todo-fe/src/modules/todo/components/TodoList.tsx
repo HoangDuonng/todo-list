@@ -270,7 +270,7 @@ const TodoList = () => {
                       } else {
                         activeClass = "bg-red-500/10 text-red-500 border-red-500/30 dark:bg-red-500/20";
                       }
-                      const label = p === "low" ? "Thấp" : p === "medium" ? "Trung bình" : "Khẩn cấp";
+                      const label = p === "low" ? "Low" : p === "medium" ? "Medium" : "Urgent";
                       return (
                         <button
                           key={p}
@@ -377,7 +377,7 @@ const TodoList = () => {
         >
           <Heart className="h-3.5 w-3.5 text-red-500 fill-red-500/20" />
           <span>
-            Made by <a href="https://github.com/hoangduonng" target="_blank" rel="noopener noreferrer">Hoang Duonngg</a>
+            Made by <a href="https://github.com/hoangduonng" target="_blank" rel="noopener noreferrer">Hoang Duonng</a>
           </span>
         </Button>
       </div>

@@ -52,7 +52,7 @@ var rootCmd = &cobra.Command{
 		ginComp := serviceCtx.MustGet(common.KeyCompGIN).(common.GINComponent)
 
 		router := ginComp.GetRouter()
-		router.Use(gin.Recovery(), gin.Logger(), smdlw.Recovery(serviceCtx))
+		router.Use(gin.Recovery(), gin.LoggerWithConfig(gin.LoggerConfig{SkipPaths: []string{"/ping"}}), smdlw.Recovery(serviceCtx))
 
 		router.Use(middleware.Cors())
 		router.GET("/ping", func(c *gin.Context) {
