@@ -376,7 +376,9 @@ const TodoList = () => {
           className="text-xs text-muted-foreground hover:text-foreground gap-1.5 transition-all duration-200"
         >
           <Heart className="h-3.5 w-3.5 text-red-500 fill-red-500/20" />
-          <span>Made by Hoang Duong</span>
+          <span>
+            Made by <a href="https://github.com/hoangduonng" target="_blank" rel="noopener noreferrer">Hoang Duonngg</a>
+          </span>
         </Button>
       </div>
     </div>
