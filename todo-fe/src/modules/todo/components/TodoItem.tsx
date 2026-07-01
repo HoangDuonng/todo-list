@@ -98,7 +98,7 @@ const TodoItem: React.FC<TodoItemProps> = ({
                 } else {
                   activeClass = "bg-red-500/10 text-red-500 border-red-500/30 dark:bg-red-500/20";
                 }
-                const label = p === "low" ? "Thấp" : p === "medium" ? "Trung bình" : "Khẩn cấp";
+                const label = p === "low" ? "Low" : p === "medium" ? "Medium" : "Urgent";
                 return (
                   <button
                     key={p}
@@ -163,17 +163,17 @@ const TodoItem: React.FC<TodoItemProps> = ({
                 </p>
                 {priority === "urgent" && (
                   <span className="px-1.5 py-0.5 text-[10px] font-bold rounded bg-red-500/10 text-red-500 border border-red-500/20 dark:bg-red-500/20 shadow-sm animate-pulse">
-                    Khẩn cấp
+                    Urgent
                   </span>
                 )}
                 {priority === "medium" && (
                   <span className="px-1.5 py-0.5 text-[10px] font-bold rounded bg-yellow-500/10 text-yellow-600 border border-yellow-500/20 dark:bg-yellow-500/20 dark:text-yellow-400">
-                    Trung bình
+                    Medium
                   </span>
                 )}
                 {priority === "low" && (
                   <span className="px-1.5 py-0.5 text-[10px] font-bold rounded bg-blue-500/10 text-blue-500 border border-blue-500/20 dark:bg-blue-500/20">
-                    Thấp
+                    Low
                   </span>
                 )}
               </div>

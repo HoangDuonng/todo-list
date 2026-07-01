@@ -270,7 +270,7 @@ const TodoList = () => {
                       } else {
                         activeClass = "bg-red-500/10 text-red-500 border-red-500/30 dark:bg-red-500/20";
                       }
-                      const label = p === "low" ? "Thấp" : p === "medium" ? "Trung bình" : "Khẩn cấp";
+                      const label = p === "low" ? "Low" : p === "medium" ? "Medium" : "Urgent";
                       return (
                         <button
                           key={p}
