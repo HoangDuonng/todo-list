@@ -377,7 +377,7 @@ const TodoList = () => {
         >
           <Heart className="h-3.5 w-3.5 text-red-500 fill-red-500/20" />
           <span>
-            Made by <a href="https://github.com/hoangduonng" target="_blank" rel="noopener noreferrer">Hoang Duonngg</a>
+            Made by <a href="https://github.com/hoangduonng" target="_blank" rel="noopener noreferrer">Hoang Duonng</a>
           </span>
         </Button>
       </div>
