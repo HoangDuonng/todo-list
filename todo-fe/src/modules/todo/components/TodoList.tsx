@@ -258,7 +258,7 @@ const TodoList = () => {
                   </Button>
                 </div>
                 <div className="flex items-center gap-3 text-xs pl-1">
-                  <span className="text-muted-foreground font-medium">Độ ưu tiên cho tác vụ mới:</span>
+                  <span className="text-muted-foreground font-medium">Priority for new task:</span>
                   <div className="flex gap-2">
                     {(["low", "medium", "urgent"] as TodoPriority[]).map((p) => {
                       let activeClass = "";
