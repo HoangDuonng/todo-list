@@ -15,5 +15,4 @@ const Root = () => {
   }
 };
 
-// Test full flow
 createRoot(document.getElementById("root")!).render(<Root />);
