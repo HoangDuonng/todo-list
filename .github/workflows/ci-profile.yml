@@ -59,8 +59,8 @@ jobs:
 
       - name: Build and Push
         run: |
-          docker build -t asia-southeast1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/todo-repo/profile-service:${{ github.sha }} ./profile-service
-          docker push asia-southeast1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/todo-repo/profile-service:${{ github.sha }}
+          docker build -t asia-southeast1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/todo-repo-dev/profile-service:${{ github.sha }} ./profile-service
+          docker push asia-southeast1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/todo-repo-dev/profile-service:${{ github.sha }}
 
       - name: Checkout GitOps repository
         uses: actions/checkout@v4
