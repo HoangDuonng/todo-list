@@ -2,7 +2,7 @@ package main
 
 import "demo-service/cmd"
 
-// Test 2
+// Test 3
 func main() {
 	cmd.Execute()
 }
