@@ -90,7 +90,7 @@ github.com/hashicorp/errwrap v1.1.0/go.mod h1:YH+1FKiLXxHSkmPseP+kNlulaMuP3n2brv
 github.com/hashicorp/go-multierror v1.1.1 h1:H5DkEtf6CXdFp0N0Em5UCwQpXMWke8IA0+lD48awMYo=
 github.com/hashicorp/go-multierror v1.1.1/go.mod h1:iw975J/qwKPdAO1clOe2L8331t/9/fmwbPZ6JB6eMoM=
 github.com/hashicorp/go-uuid v1.0.2/go.mod h1:6SBZvOh/SIDV7/2o3Jml5SYk/TvGqwFJ/bN7x4byOro=
-github.com/hoangduonng/service-context v0.1.0 h1:fYTSzwaxSwZE+39QkoK22r1HbC4SmLDtjrWU80hvZls=
+github.com/hoangduonng/service-context v0.1.0 h1:HeX8hlOevu/44QW3mtAordCewRW6wYGOe8I+FQfZviU=
 github.com/hoangduonng/service-context v0.1.0/go.mod h1:FCiaufx7xEfam4CKiiA53xRFm4O69/He/BMZ9ZIpYy0=
 github.com/hpcloud/tail v1.0.0/go.mod h1:ab1qPbhIpdTxEkNHXyeSf5vhxWSCs/tWer42PpOxQnU=
 github.com/inconshreveable/mousetrap v1.0.1 h1:U3uMjPSQEBMNp1lFxmllqCPM6P5u/Xq7Pgzkat/bFNc=

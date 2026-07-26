@@ -1,6 +1,7 @@
 FROM golang:1.19-alpine as builder
 
 RUN apk add --no-cache git ca-certificates
+ENV GONOSUMDB=github.com/hoangduonng/*
 
 RUN mkdir /app
 ADD . /app/
