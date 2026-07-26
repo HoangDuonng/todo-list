@@ -15,5 +15,5 @@ const Root = () => {
   }
 };
 
-// Test 5
+// Test 6
 createRoot(document.getElementById("root")!).render(<Root />);
