@@ -55,12 +55,12 @@ jobs:
 
       - name: Configure Docker
         run: |
-          gcloud auth configure-docker asia-southeast1-docker.pkg.dev
+          gcloud auth configure-docker us-central1-docker.pkg.dev
 
       - name: Build and Push
         run: |
-          docker build -t asia-southeast1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/todo-repo-dev/auth-service:${{ github.sha }} ./auth-service
-          docker push asia-southeast1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/todo-repo-dev/auth-service:${{ github.sha }}
+          docker build -t us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/todo-repo-dev/auth-service:${{ github.sha }} ./auth-service
+          docker push us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/todo-repo-dev/auth-service:${{ github.sha }}
 
       - name: Checkout GitOps repository
         uses: actions/checkout@v4
