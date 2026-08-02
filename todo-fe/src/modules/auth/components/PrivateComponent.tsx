@@ -19,7 +19,7 @@ export const PrivateComponent: React.FC<IPrivateComponentProps> = ({
       console.log("Redirecting to login");
       navigate("/login", { replace: true });
     }
-  }, []);
+  }, [profile, navigate]);
 
   return <>{profile ? children : <></>}</>;
 };

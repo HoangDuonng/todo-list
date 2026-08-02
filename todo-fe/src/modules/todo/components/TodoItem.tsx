@@ -2,8 +2,6 @@ import React, { memo, useMemo, useState } from "react";
 import { ITodoItem, TodoPriority } from "../models/todo";
 import { Check, Edit2, Trash2, GripVertical } from "lucide-react";
 import DeleteWarningDialog from "./DeleteWarningDialog";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";

@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import { createContext, useCallback, useEffect, useState } from "react";
 import {
   ILoginForm,
@@ -60,7 +61,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       localStorage.removeItem("access_token");
       navigate("/login");
     }
-  }, []);
+  }, [navigate]);
 
   const handleUpdateProfile = async (data: IUpdateProfile) => {
     try {

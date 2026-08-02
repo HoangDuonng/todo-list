@@ -20,7 +20,6 @@ import { ErrorResponse } from "react-router-dom";
 import { HandleError } from "../../core/services/axios";
 import { useAuth } from "../../auth/hooks/useAuth";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
