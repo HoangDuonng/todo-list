@@ -3,6 +3,7 @@ import { ITodoItem, TodoPriority } from "../models/todo";
 import { Check, Edit2, Trash2, GripVertical } from "lucide-react";
 import DeleteWarningDialog from "./DeleteWarningDialog";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
@@ -26,6 +27,7 @@ const TodoItem: React.FC<TodoItemProps> = ({
   const [open, setOpen] = useState(false);
   const [editMode, setEditMode] = useState(false);
   const [value, setValue] = useState(item.title);
+  const [descValue, setDescValue] = useState(item.description || "");
 
   const priority = item.priority || "medium";
   const [editPriority, setEditPriority] = useState<TodoPriority>(priority);
@@ -47,12 +49,13 @@ const TodoItem: React.FC<TodoItemProps> = ({
 
   const handleStartEdit = () => {
     setValue(item.title);
+    setDescValue(item.description || "");
     setEditPriority(priority);
     setEditMode(true);
   };
 
   const handleUpdate = async () => {
-    await onUpdate(item.id, value, item.description, editPriority);
+    await onUpdate(item.id, value, descValue, editPriority);
     setEditMode(false);
   };
 
@@ -66,21 +69,35 @@ const TodoItem: React.FC<TodoItemProps> = ({
     >
       {editMode ? (
         <div className="flex flex-col w-full gap-2">
-          <div className="flex w-full justify-center items-center gap-2">
-            <Input
-              onKeyDown={(e) => e.key === "Enter" && handleUpdate()}
-              type="text"
-              autoFocus
-              value={value}
-              onChange={(e) => setValue(e.target.value)}
-              placeholder="Enter a new task..."
-              className="flex-grow h-9 text-sm"
-            />
+          <div className="flex w-full items-start gap-2">
+            <div className="flex flex-col w-full flex-grow bg-background border border-input rounded-md focus-within:ring-1 focus-within:ring-ring overflow-hidden">
+              <input
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    document.getElementById(`edit-desc-${item.id}`)?.focus();
+                  }
+                }}
+                type="text"
+                autoFocus
+                value={value}
+                onChange={(e) => setValue(e.target.value)}
+                placeholder="Task title..."
+                className="w-full px-3 py-2 text-sm font-medium outline-none bg-transparent"
+              />
+              <textarea
+                id={`edit-desc-${item.id}`}
+                value={descValue}
+                onChange={(e) => setDescValue(e.target.value)}
+                placeholder="Description (optional)..."
+                className="w-full px-3 py-1 pb-2 text-xs text-muted-foreground outline-none border-none shadow-none resize-none focus-visible:ring-0 bg-transparent min-h-[40px]"
+              />
+            </div>
             <Button
               size="icon"
               variant="ghost"
               onClick={handleUpdate}
-              className="text-green-600 hover:text-green-700 hover:bg-green-100/50 dark:hover:bg-green-900/30 h-9 w-9 shrink-0"
+              className="text-green-600 hover:text-green-700 hover:bg-green-100/50 dark:hover:bg-green-900/30 h-9 w-9 shrink-0 mt-0.5"
             >
               <Check className="h-4 w-4" />
             </Button>
@@ -177,7 +194,12 @@ const TodoItem: React.FC<TodoItemProps> = ({
                   </span>
                 )}
               </div>
-              <span className="text-[11px] text-muted-foreground mt-0.5 select-none">
+              {item.description && (
+                <p className="text-[12px] text-muted-foreground mt-1 whitespace-pre-wrap break-words">
+                  {item.description}
+                </p>
+              )}
+              <span className="text-[11px] text-muted-foreground mt-1.5 select-none opacity-80">
                 Author: {item.user.first_name} {item.user.last_name}
               </span>
             </div>

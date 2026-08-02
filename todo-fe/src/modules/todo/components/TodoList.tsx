@@ -41,7 +41,8 @@ import {
 
 const TodoList = () => {
   const [todos, setTodos] = useState<ITodoItem[]>([]);
-  const [newTodo, setNewTodo] = useState("");
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
   const [priority, setPriority] = useState<TodoPriority>("medium");
   const { profile } = useAuth();
   const [note, setNote] = useState("");
@@ -176,17 +177,17 @@ const TodoList = () => {
 
   const handleAddTask = useCallback(async () => {
     try {
-      if (!newTodo || newTodo.trim().length === 0) {
+      if (!title || title.trim().length === 0) {
         toast.error("Title cannot be blank");
         return;
       }
 
-      const result = await CreateTodoAPI<IResponse<string>>(newTodo, "", priority);
+      const result = await CreateTodoAPI<IResponse<string>>(title, description, priority);
       const t: ITodoItem = {
         id: result.data,
-        title: newTodo,
+        title: title,
         status: "doing",
-        description: "",
+        description: description,
         priority: priority,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
@@ -201,13 +202,14 @@ const TodoList = () => {
         },
       };
       setTodos((prev) => [t, ...prev]);
-      setNewTodo("");
+      setTitle("");
+      setDescription("");
       setPriority("medium");
       toast.success("Task added successfully");
     } catch (error) {
       toast.error(HandleError(error as Error | AxiosError<ErrorResponse>).message);
     }
-  }, [newTodo, priority, profile]);
+  }, [title, description, priority, profile]);
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
@@ -244,20 +246,32 @@ const TodoList = () => {
           <TabsContent value="tasks" className="mt-0 focus-visible:ring-0">
             <CardContent className="pt-6 flex flex-col gap-6">
               <div className="flex flex-col gap-3 w-full bg-accent/20 p-3 rounded-lg border border-border">
-                <div className="flex gap-2 w-full">
-                  <Input
-                    onKeyDown={(e) => e.key === "Enter" && handleAddTask()}
+                <div className="flex flex-col w-full bg-background border border-input rounded-md focus-within:ring-1 focus-within:ring-ring overflow-hidden">
+                  <input
                     type="text"
-                    value={newTodo}
-                    onChange={(e) => setNewTodo(e.target.value)}
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        document.getElementById("task-description-input")?.focus();
+                      }
+                    }}
                     placeholder="What needs to be done?"
-                    className="flex-grow focus-visible:ring-1 focus-visible:ring-ring bg-background"
+                    className="w-full px-3 py-2 text-base font-medium outline-none bg-transparent placeholder:text-muted-foreground"
                   />
-                  <Button onClick={handleAddTask} variant="default" className="px-5 shrink-0 font-semibold">
-                    Add Task
-                  </Button>
+                  {(title || description) && (
+                    <Textarea
+                      id="task-description-input"
+                      value={description}
+                      onChange={(e) => setDescription(e.target.value)}
+                      placeholder="Add a more detailed description... (Optional)"
+                      className="w-full px-3 py-1 pb-3 text-sm text-muted-foreground outline-none border-none shadow-none resize-none focus-visible:ring-0 bg-transparent min-h-[60px]"
+                    />
+                  )}
                 </div>
-                <div className="flex items-center gap-3 text-xs pl-1">
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                  <div className="flex items-center gap-3 text-xs pl-1">
                   <span className="text-muted-foreground font-medium">Priority for new task:</span>
                   <div className="flex gap-2">
                     {(["low", "medium", "urgent"] as TodoPriority[]).map((p) => {
@@ -286,6 +300,9 @@ const TodoList = () => {
                     })}
                   </div>
                 </div>
+                <Button onClick={handleAddTask} variant="default" className="px-6 w-full sm:w-auto font-semibold">
+                  Add Task
+                </Button>
               </div>
 
               <div className="flex justify-between items-center text-sm border-b pb-3 border-border">
