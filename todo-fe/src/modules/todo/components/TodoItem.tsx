@@ -178,6 +178,17 @@ const TodoItem: React.FC<TodoItemProps> = ({
                 >
                   {item.title}
                 </p>
+              </div>
+              {item.description && (
+                <p className="text-[12px] text-muted-foreground mt-1 whitespace-pre-wrap break-words">
+                  {item.description}
+                </p>
+              )}
+              <div className="flex items-center gap-2 mt-1.5">
+                <span className="text-[11px] text-muted-foreground select-none opacity-80">
+                  Author: {item.user.first_name} {item.user.last_name}
+                </span>
+                <span className="text-[10px] text-muted-foreground/30">•</span>
                 {priority === "urgent" && (
                   <span className="px-1.5 py-0.5 text-[10px] font-bold rounded bg-red-500/10 text-red-500 border border-red-500/20 dark:bg-red-500/20 shadow-sm animate-pulse">
                     Urgent
@@ -194,14 +205,6 @@ const TodoItem: React.FC<TodoItemProps> = ({
                   </span>
                 )}
               </div>
-              {item.description && (
-                <p className="text-[12px] text-muted-foreground mt-1 whitespace-pre-wrap break-words">
-                  {item.description}
-                </p>
-              )}
-              <span className="text-[11px] text-muted-foreground mt-1.5 select-none opacity-80">
-                Author: {item.user.first_name} {item.user.last_name}
-              </span>
             </div>
           </div>
 
