@@ -264,7 +264,7 @@ const TodoList = () => {
                       id="task-description-input"
                       value={description}
                       onChange={(e) => setDescription(e.target.value)}
-                      placeholder="Add a more detailed description... (Optional)"
+                      placeholder="Add a more detailed description"
                       className="w-full px-3 py-1 pb-3 text-sm text-muted-foreground outline-none border-none shadow-none resize-none focus-visible:ring-0 bg-transparent min-h-[60px]"
                     />
                   )}
