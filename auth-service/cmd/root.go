@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"context"
 	"demo-service/common"
 	"demo-service/composer"
 	"demo-service/middleware"
@@ -13,12 +14,14 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/spf13/cobra"
 	sctx "github.com/hoangduonng/service-context"
 	"github.com/hoangduonng/service-context/component/ginc"
 	smdlw "github.com/hoangduonng/service-context/component/ginc/middleware"
 	"github.com/hoangduonng/service-context/component/gormc"
 	"github.com/hoangduonng/service-context/component/jwtc"
+	"github.com/spf13/cobra"
+	"go.opentelemetry.io/contrib/instrumentation/github.com/gin-gonic/gin/otelgin"
+	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
 	"google.golang.org/grpc"
 )
 
@@ -42,6 +45,15 @@ var rootCmd = &cobra.Command{
 
 		common.RunDBMigration("migrations")
 
+		serviceName := os.Getenv("OTEL_SERVICE_NAME")
+		if serviceName == "" {
+			serviceName = "auth-service"
+		}
+		shutdown, err := common.InitTracer(serviceName)
+		if err == nil && shutdown != nil {
+			defer shutdown(context.Background())
+		}
+
 		serviceCtx := newServiceCtx()
 
 		logger := sctx.GlobalLogger().GetLogger("service")
@@ -53,6 +65,7 @@ var rootCmd = &cobra.Command{
 		ginComp := serviceCtx.MustGet(common.KeyCompGIN).(common.GINComponent)
 
 		router := ginComp.GetRouter()
+		router.Use(otelgin.Middleware(serviceName))
 		router.Use(gin.Recovery(), gin.LoggerWithConfig(gin.LoggerConfig{SkipPaths: []string{"/ping"}}), smdlw.Recovery(serviceCtx))
 
 		router.Use(middleware.Cors())
@@ -91,7 +104,9 @@ func StartGRPCServices(serviceCtx sctx.ServiceContext) {
 
 	logger.Infof("GRPC Server is listening on %d ...\n", configComp.GetGRPCPort())
 
-	s := grpc.NewServer()
+	s := grpc.NewServer(
+		grpc.StatsHandler(otelgrpc.NewServerHandler()),
+	)
 
 	pb.RegisterAuthServiceServer(s, composer.ComposeAuthGRPCService(serviceCtx))
 

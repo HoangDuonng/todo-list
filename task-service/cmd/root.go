@@ -1,20 +1,23 @@
 package cmd
 
 import (
+	"context"
 	"demo-service/common"
 	"demo-service/composer"
 	"demo-service/middleware"
 	"fmt"
+	"net/http"
+	"os"
+	"time"
+
 	"github.com/gin-gonic/gin"
-	"github.com/spf13/cobra"
 	sctx "github.com/hoangduonng/service-context"
 	"github.com/hoangduonng/service-context/component/ginc"
 	smdlw "github.com/hoangduonng/service-context/component/ginc/middleware"
 	"github.com/hoangduonng/service-context/component/gormc"
 	"github.com/hoangduonng/service-context/component/jwtc"
-	"net/http"
-	"os"
-	"time"
+	"github.com/spf13/cobra"
+	"go.opentelemetry.io/contrib/instrumentation/github.com/gin-gonic/gin/otelgin"
 )
 
 func newServiceCtx() sctx.ServiceContext {
@@ -37,6 +40,15 @@ var rootCmd = &cobra.Command{
 
 		common.RunDBMigration("migrations")
 
+		serviceName := os.Getenv("OTEL_SERVICE_NAME")
+		if serviceName == "" {
+			serviceName = "task-service"
+		}
+		shutdown, err := common.InitTracer(serviceName)
+		if err == nil && shutdown != nil {
+			defer shutdown(context.Background())
+		}
+
 		serviceCtx := newServiceCtx()
 
 		logger := sctx.GlobalLogger().GetLogger("service")
@@ -48,6 +60,7 @@ var rootCmd = &cobra.Command{
 		ginComp := serviceCtx.MustGet(common.KeyCompGIN).(common.GINComponent)
 
 		router := ginComp.GetRouter()
+		router.Use(otelgin.Middleware(serviceName))
 		router.Use(gin.Recovery(), gin.LoggerWithConfig(gin.LoggerConfig{SkipPaths: []string{"/ping"}}), smdlw.Recovery(serviceCtx))
 
 		router.Use(middleware.Cors())
