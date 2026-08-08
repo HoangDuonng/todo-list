@@ -1,4 +1,4 @@
-FROM golang:1.24-alpine as builder
+FROM golang:alpine as builder
 
 RUN apk add --no-cache git ca-certificates
 ENV GONOSUMDB=github.com/hoangduonng/*
