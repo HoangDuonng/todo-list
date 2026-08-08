@@ -5,6 +5,7 @@ import (
 	"demo-service/common"
 	"demo-service/proto/pb"
 	sctx "github.com/hoangduonng/service-context"
+	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"log"
@@ -28,8 +29,11 @@ func (ac *authClient) IntrospectToken(ctx context.Context, accessToken string) (
 func ComposeAuthRPCClient(serviceCtx sctx.ServiceContext) *authClient {
 	configComp := serviceCtx.MustGet(common.KeyCompConf).(common.Config)
 
-	opts := grpc.WithTransportCredentials(insecure.NewCredentials())
-	clientConn, err := grpc.Dial(configComp.GetGRPCAuthServerAddress(), opts)
+	opts := []grpc.DialOption{
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
+		grpc.WithStatsHandler(otelgrpc.NewClientHandler()),
+	}
+	clientConn, err := grpc.Dial(configComp.GetGRPCAuthServerAddress(), opts...)
 
 	if err != nil {
 		log.Fatal(err)
