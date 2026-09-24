@@ -1,0 +1,78 @@
+{
+  "scenario": {
+    "name": "todo-staging-lifecycle",
+    "description": "Login with seeded user, list tasks, create a task and delete it (via gateway)",
+    "steps": [
+      {
+        "id": "login",
+        "method": "POST",
+        "path": "/auth/v1/authenticate",
+        "body": {
+          "email": "treplay@test.local",
+          "password": "Test1234!"
+        },
+        "expect": {
+          "status": 200
+        },
+        "capture": {
+          "token": "$.data.access_token.token"
+        }
+      },
+      {
+        "id": "list_tasks",
+        "method": "GET",
+        "path": "/tasks/v1/tasks",
+        "headers": {
+          "Authorization": "Bearer {{token}}"
+        },
+        "delay_ms": 100,
+        "expect": {
+          "status": 200
+        }
+      },
+      {
+        "id": "create_task",
+        "method": "POST",
+        "path": "/tasks/v1/tasks",
+        "headers": {
+          "Authorization": "Bearer {{token}}"
+        },
+        "body": {
+          "title": "treplay probe task",
+          "description": "created by traffic-replay gate, safe to delete",
+          "priority": "medium"
+        },
+        "delay_ms": 200,
+        "expect": {
+          "status": 200
+        },
+        "capture": {
+          "task_id": "$.data"
+        }
+      },
+      {
+        "id": "delete_task",
+        "method": "DELETE",
+        "path": "/tasks/v1/tasks/{{task_id}}",
+        "headers": {
+          "Authorization": "Bearer {{token}}"
+        },
+        "delay_ms": 100,
+        "expect": {
+          "status": 200
+        }
+      }
+    ]
+  },
+  "replay": {
+    "concurrency": 5,
+    "speed": 1.0,
+    "iterations": 10,
+    "timeout_ms": 10000,
+    "thresholds": {
+      "p95_latency_max_pct": 30.0,
+      "rps_drop_max_pct": -30.0,
+      "max_error_rate_pct": 0.0
+    }
+  }
+}
