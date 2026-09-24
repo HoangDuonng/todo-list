@@ -1,0 +1,120 @@
+name: CI - Staging Regression Gate
+
+on:
+  pull_request:
+    branches:
+      - main
+      - develop
+    paths:
+      - 'task-service/**'
+      - '.github/workflows/regression-gate.yml'
+      - '.github/workflows/scenario-todo-staging.json'
+
+permissions:
+  contents: read
+  id-token: write
+  pull-requests: write
+
+jobs:
+  regression-gate:
+    name: K8s Staging Regression Gate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Authenticate to GCP
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Configure Docker for GAR
+        run: |
+          gcloud auth configure-docker asia-southeast1-docker.pkg.dev
+
+      - name: Pull Traffic Replay Engine
+        run: |
+          docker pull asia-southeast1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/todo-repo-dev/traffic-replay:latest
+
+      - name: Warmup Staging Endpoints
+        run: |
+          echo "Warming up baseline and candidate endpoints..."
+          docker run --rm \
+            -v ${{ github.workspace }}:/workspace \
+            asia-southeast1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/todo-repo-dev/traffic-replay:latest \
+            run -config /workspace/.github/workflows/scenario-todo-staging.json \
+            -target http://baseline.35.240.183.204.sslip.io -concurrency 2 -iterations 2 || true
+
+          docker run --rm \
+            -v ${{ github.workspace }}:/workspace \
+            asia-southeast1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/todo-repo-dev/traffic-replay:latest \
+            run -config /workspace/.github/workflows/scenario-todo-staging.json \
+            -target http://candidate.35.240.183.204.sslip.io -concurrency 2 -iterations 2 || true
+
+      - name: Run Regression Comparator Gate
+        id: compare
+        run: |
+          set +e
+          docker run --rm \
+            -v ${{ github.workspace }}:/workspace \
+            asia-southeast1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/todo-repo-dev/traffic-replay:latest \
+            compare \
+            -config /workspace/.github/workflows/scenario-todo-staging.json \
+            -baseline http://baseline.35.240.183.204.sslip.io \
+            -candidate http://candidate.35.240.183.204.sslip.io \
+            -concurrency 5 -iterations 10 \
+            -format markdown \
+            -output /workspace/report.md
+          
+          EXIT_CODE=$?
+          echo "GATE_EXIT_CODE=${EXIT_CODE}" >> $GITHUB_ENV
+          set -e
+
+      - name: Render Report in Job Summary
+        if: always()
+        run: |
+          if [ -f report.md ]; then
+            cat report.md >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: Comment Report to Pull Request
+        uses: actions/github-script@v7
+        if: always()
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const fs = require('fs');
+            if (!fs.existsSync('report.md')) {
+              console.log('No report.md found to comment.');
+              return;
+            }
+            const report = fs.readFileSync('report.md', 'utf8');
+            const commentBody = `### 🚦 K8s Staging Traffic-Replay Gate Report\n\n**Commit**: \`${context.sha}\`\n\n${report}`;
+            
+            // Post comment to current Pull Request
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: commentBody
+            });
+
+      - name: Upload Gate Report Artifact
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: regression-report-${{ github.sha }}
+          path: report.md
+          retention-days: 30
+
+      - name: Enforce Gate Verdict
+        run: |
+          if [ "${GATE_EXIT_CODE}" != "0" ]; then
+            echo "::error::Candidate service failed regression gate with exit code ${GATE_EXIT_CODE}! Blocking PR merge."
+            exit 1
+          fi
+          echo "Candidate passed regression gate successfully!"
