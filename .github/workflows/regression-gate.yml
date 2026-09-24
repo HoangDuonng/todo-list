@@ -60,6 +60,7 @@ jobs:
         run: |
           set +e
           docker run --rm \
+            --user "$(id -u):$(id -g)" \
             -v ${{ github.workspace }}:/workspace \
             asia-southeast1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/todo-repo-dev/traffic-replay:latest \
             compare \
