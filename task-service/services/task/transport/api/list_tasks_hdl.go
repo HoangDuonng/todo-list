@@ -4,7 +4,6 @@ import (
 	"demo-service/common"
 	"demo-service/services/task/entity"
 	"net/http"
-	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/hoangduonng/service-context/core"
@@ -39,9 +38,6 @@ func (api *api) ListTaskHdl() func(*gin.Context) {
 		for i := range tasks {
 			tasks[i].Mask()
 		}
-
-		// Simulate performance regression in candidate (e.g. unindexed DB query / heavy processing)
-		time.Sleep(250 * time.Millisecond)
 
 		c.JSON(http.StatusOK, core.SuccessResponse(tasks, rp.Paging, rp.Filter))
 	}
