@@ -94,7 +94,7 @@ jobs:
               return;
             }
             const report = fs.readFileSync('report.md', 'utf8');
-            const commentBody = `### 🚦 K8s Staging Traffic-Replay Gate Report\n\n**Commit**: \`${context.sha}\`\n\n${report}`;
+            const commentBody = `### Staging Traffic-Replay Gate Report\n\n**Commit**: \`${context.sha}\`\n\n${report}`;
             
             // Post comment to current Pull Request
             await github.rest.issues.createComment({
