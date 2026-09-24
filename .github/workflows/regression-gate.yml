@@ -47,13 +47,13 @@ jobs:
             -v ${{ github.workspace }}:/workspace \
             asia-southeast1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/todo-repo-dev/traffic-replay:latest \
             run -config /workspace/.github/workflows/scenario-todo-staging.json \
-            -target http://baseline.35.240.183.204.sslip.io -concurrency 2 -iterations 2 || true
+            -target http://baseline.35.240.183.204.sslip.io -concurrency 2 -iterations 4 || true
 
           docker run --rm \
             -v ${{ github.workspace }}:/workspace \
             asia-southeast1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/todo-repo-dev/traffic-replay:latest \
             run -config /workspace/.github/workflows/scenario-todo-staging.json \
-            -target http://candidate.35.240.183.204.sslip.io -concurrency 2 -iterations 2 || true
+            -target http://candidate.35.240.183.204.sslip.io -concurrency 2 -iterations 4 || true
 
       - name: Run Regression Comparator Gate
         id: compare
